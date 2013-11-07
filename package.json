@@ -5,7 +5,7 @@
 	"main": "server.js",
 	"bin": {
 		"crossmon-server": "./bin/crossmon-server.js"
-	}
+	},
 	"version": "0.0.5",
 	"engines": {
 		"node": ">=0.8.0"
