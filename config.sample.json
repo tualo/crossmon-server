@@ -1,10 +1,17 @@
 {
 	"displayPort": 8070,
 	"collectPort": 7654,
-	"loglevel": 3,
+	"loglevel": 2,
 	"db":{
-		"type": "sqlite",
-		"file": "./data.sqlite"
+		"#type": "sqlite",
+		"#file": "./data.sqlite",
+		"type": "mysql",
+		"options": {
+			"host": "localhost",
+			"database": "crossmon",
+			"username": "root",
+			"password": ""
+		}
 	},
 	"session_secret": "bshdguzetVDhgf",
 	"clients": [
