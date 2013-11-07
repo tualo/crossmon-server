@@ -7,7 +7,7 @@ var fs = require('fs');
 var http = require('http');
 var path = require('path');
 var socketio = require('socket.io');
-var sqlite3 = require('sqlite3').verbose();
+
 
 //var sass = require('node-sass');
 
@@ -134,14 +134,30 @@ function initDisplayServer(){
 	displayServer.listen(displayApp.get('port'), function(){logger.log('info',"display server listening on port " + displayApp.get('port'));});
 	displayIO = require('socket.io').listen(displayServer);
 	displayIO.set('log level', 0);
-	
 	// hier muss noch gerüft werden, ob nur zugelassene clients
 	// diese daten abrufen
-	displayIO.sockets.on('connection', function (socket) {
-		
-	});
+	displayIO.sockets.on('connection', function (socket) {});
 }
 
+var initAfterTableCreation = function(){
+	serversTable = new DynamicTable(db,'servers',logger);
+	programsTable = new DynamicTable(db,'programs',logger);
+	tagsTable = new DynamicTable(db,'tags',logger);
+	if (typeof config.collectPort){
+		
+		
+		setInterval(writeStack,10000);
+		logger.log('info','collector listening on port: '+config.collectPort);
+		var io = socketio.listen(config.collectPort);
+		io.set('log level', 0);
+		io.sockets.on('connection', inCommingConnection);
+		
+	}
+	
+	if (typeof config.displayPort){
+		initDisplayServer();
+	} // if (typeof config.displayPort)
+}
 
 function initDB(){
 	if (typeof config=='undefined'){
@@ -155,38 +171,42 @@ function initDB(){
 	if (typeof config.loglevel!=='undefined'){
 		logger.level = config.loglevel;
 	}
-	if (config.db.type!=='sqlite'){
-		logger.log('error','Only SQLite is supported, currently.');
-		process.exit();
-	}else{
-		if (typeof config.db.file=='undefined'){
-			logger.log('error','No Database file is specified.');
+	switch(config.db.type){
+		case 'mysql': 
+			var mysql;
+			try{
+				mysql = require('./lib/mysql');
+			}catch(e){
+				logger.log('error','You must install node module for mysql. (npm install mysql)');
+				process.exit();
+			}
+			db = new mysql(config.options);
+			db.connect();
+			createTable(initAfterTableCreation);
+			break;
+		case 'sqlite':
+			
+			if (typeof config.db.file=='undefined'){
+				logger.log('error','No Database file is specified.');
+				process.exit();
+			}
+			var sqlite3;
+			try{
+				sqlite3 = require('sqlite3').verbose();
+			}catch(e){
+				logger.log('error','You must install sqlite3. (npm install sqlite3)');
+				process.exit();
+			}
+			config.db.file = config.db.file.replace(/^\.\//,__dirname+'/');
+			logger.log('debug',config.db.file);
+			db = new sqlite3.Database(config.db.file, function(){
+				createTable(initAfterTableCreation);
+			}) // sqlite Database
+			break;
+		default:
+			logger.log('error','Only SQLite is supported, currently.');
 			process.exit();
-		}
-		config.db.file = config.db.file.replace(/^\.\//,__dirname+'/');
-		logger.log('debug',config.db.file);
-		db = new sqlite3.Database(config.db.file, function(){
-			createTable(function(){
-				
-				serversTable = new DynamicTable(db,'servers',logger);
-				programsTable = new DynamicTable(db,'programs',logger);
-				tagsTable = new DynamicTable(db,'tags',logger);
-				if (typeof config.collectPort){
-					
-					
-					setInterval(writeStack,10000);
-					logger.log('info','collector listening on port: '+config.collectPort);
-					var io = socketio.listen(config.collectPort);
-					io.set('log level', 0);
-					io.sockets.on('connection', inCommingConnection);
-					
-				}
-				
-				if (typeof config.displayPort){
-					initDisplayServer();
-				} // if (typeof config.displayPort)
-			});
-		}) // sqlite Database
+			break;
 	}
 }
 
