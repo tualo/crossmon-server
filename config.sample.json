@@ -1,7 +1,7 @@
 {
 	"displayPort": 8070,
 	"collectPort": 7654,
-	"loglevel": 2,
+	"loglevel": 3,
 	"db":{
 		"type": "sqlite",
 		"file": "./data.sqlite"
