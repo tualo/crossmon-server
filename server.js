@@ -26,7 +26,24 @@ var serversTable;
 var programsTable;
 var tagsTable;
 
+var insertStack = [];
+var stackTimer;
+var insertStack_locked=false;
 
+function writeStack(){
+	if (insertStack.length>0){
+		insertStack_locked=true;
+		logger.log('debug',"write to db "+insertStack.length+" entries");
+		var stmt = db.prepare("INSERT INTO data (server_id,program_id,tag_id,time,val)VALUES (?,?,?,?,?)");
+		for (var i = 0; i < insertStack.length; i++) {
+			stmt.run(insertStack[i]);
+		}
+		stmt.finalize();
+		logger.log('debug',insertStack.length+" entries written");
+		insertStack=[];
+		insertStack_locked=false;
+	}
+}
 
 function createTable(callback) {
 	fs.readFile(path.join(__dirname,'ddl.sql'), function (err, data) {
@@ -74,10 +91,12 @@ function inCommingConnection(socket){
 		if (typeof displayIO!='undefined'){
 			//displayIO.sockets.emit(values[0]+'/'+values[1]+'/'+values[2],{ time: data.time, value: data.value });
 			displayIO.sockets.emit(values[0]+'/'+values[1],{tag: values[2], time: data.time, value: data.value });
+			
 		}
-		db.run("INSERT INTO data (server_id,program_id,tag_id,time,val)VALUES (?,?,?,?,?)",values,function(){
-			//console.log(client.name+' '+JSON.stringify(values));
-		});
+		logger.log('debug',JSON.stringify(data));
+		if (!insertStack_locked){
+			insertStack.push(values);
+		}
 	});
 }
 
@@ -155,7 +174,7 @@ function initDB(){
 				if (typeof config.collectPort){
 					
 					
-					
+					setInterval(writeStack,10000);
 					logger.log('info','collector listening on port: '+config.collectPort);
 					var io = socketio.listen(config.collectPort);
 					io.set('log level', 0);
@@ -167,7 +186,7 @@ function initDB(){
 					initDisplayServer();
 				} // if (typeof config.displayPort)
 			});
-	}) // sqlite Database
+		}) // sqlite Database
 	}
 }
 
