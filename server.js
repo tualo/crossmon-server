@@ -186,8 +186,8 @@ function initDB(){
 				logger.log('error','You must install node module for mysql. (npm install mysql)');
 				process.exit();
 			}
-			db = new mysql(config.options);
-			db.connect();
+			db = new mysql();
+			db.connect(config.options);
 			createTable(initAfterTableCreation);
 			break;
 		case 'sqlite':
@@ -217,13 +217,13 @@ function initDB(){
 }
 
 function findConfiguration(){
-	fs.exists(path.join('etc','crossmon','config.json'),function(exists){
+	fs.exists(path.join('/etc','crossmon','config.json'),function(exists){
 		if (exists){
 			try{
-				config = require(path.join('etc','crossmon','config.json'));
+				config = require(path.join('/etc','crossmon','config.json'));
 				initDB();
 			}catch(e){
-				logger.log('error','The configuration is invalid.');
+				logger.log('error','The configuration is invalid. '+e.Error);
 			}
 		}else{
 			fs.exists(path.join(__dirname,'config.json'),function(exists){
