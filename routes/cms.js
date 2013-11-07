@@ -4,6 +4,7 @@ var config = require('../config').config;
 var access = null;
 */
 var db;
+var logger;
 
 var singleitem = function (req, res, next) {
 	var server = req.params.server;
@@ -25,20 +26,21 @@ var singleitem = function (req, res, next) {
 		return next();
 	}
 	var timestamp = Math.round(new Date().getTime());
-	console.log('start ID '+timestamp);
+	logger.log('debug','start ID '+timestamp);
 	db.all("select id,name from servers order by name", function(err, servers) {
-		console.log('ID '+timestamp+' servers: '+(Math.round(new Date().getTime())-timestamp ) );
+		logger.log('debug','ID '+timestamp+' servers: '+(Math.round(new Date().getTime())-timestamp ) );
 		if (err){
 			return res.json({err: err});
 		}
 		//select id,name from programs join data on programs.id=data.program_id where server_id=1  group by id,name
 		db.all("select id,name from programs join data on programs.id=data.program_id where server_id="+server+"  group by id,name", function(err, programs) {
-			console.log('ID '+timestamp+' programs: '+(Math.round(new Date().getTime())-timestamp ) );
+			logger.log('debug','ID '+timestamp+' programs: '+(Math.round(new Date().getTime())-timestamp ) );
 			if (err){
 				return res.json({err: err});
 			}
 			db.all("select id,name from tags join data on tags.id=data.tag_id where server_id="+server+" and program_id="+program+"  group by id,name", function(err, tags) {
-				
+				logger.log('debug','ID '+timestamp+' tags: '+(Math.round(new Date().getTime())-timestamp ) );
+			
 				if (err){
 					return res.json({err: err});
 				}
@@ -52,7 +54,7 @@ var singleitem = function (req, res, next) {
 					program: program,
 					tag: tag
 				});
-				console.log('done '+timestamp+'' );
+				logger.log('debug','done '+timestamp+'' );
 			});
 		});
 	});
@@ -63,10 +65,12 @@ var singleitem = function (req, res, next) {
 
 
 
-var initRoute=function(app,_db){
+var initRoute=function(app,options){
 	//access=ac;
 	//app.use(mainnavigation);
-	db = _db;
+	db = options.db;
+	logger = options.logger;
+	
 	app.get('/', singleitem);
 	app.get('/:server', singleitem);
 	app.get('/:server/:program', singleitem);

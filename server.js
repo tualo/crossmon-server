@@ -128,7 +128,13 @@ function initDisplayServer(){
 	displayApp.configure('development', function(){displayApp.use(express.errorHandler());});
 	for(var i in display_routes){
 		var route = require('./routes/'+display_routes[i]);
-		route.initRoute(displayApp,db,serversTable,programsTable,tagsTable);
+		route.initRoute(displayApp,{
+			db: db,
+			serversTable: serversTable,
+			programsTable: programsTable,
+			tagsTable: tagsTable,
+			logger: logger
+		});
 	}
 	var displayServer = http.createServer(displayApp);
 	displayServer.listen(displayApp.get('port'), function(){logger.log('info',"display server listening on port " + displayApp.get('port'));});
