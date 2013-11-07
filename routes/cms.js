@@ -15,13 +15,14 @@ var singleitem = function (req, res, next) {
 	if (typeof tag=='undefined'){tag=0};
 	
 	if (isNaN(server)){
-		next();
+		return next();
+		
 	}
 	if (isNaN(program)){
-		next();
+		return next();
 	}
 	if (isNaN(tag)){
-		next();
+		return next();
 	}
 	
 	db.all("select id,name from servers order by name", function(err, servers) {
