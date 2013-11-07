@@ -1,0 +1,16 @@
+{
+	"displayPort": 8070,
+	"collectPort": 7654,
+	"loglevel": 2,
+	"db":{
+		"type": "sqlite",
+		"file": "./data.sqlite"
+	},
+	"session_secret": "bshdguzetVDhgf",
+	"clients": [
+		{
+			"name": "Server 1",
+			"ip": "127.0.0.1"
+		}
+	]
+}

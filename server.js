@@ -1,0 +1,213 @@
+/**
+* Module dependencies.
+*/
+
+var express = require('express');
+var fs = require('fs');
+var http = require('http');
+var path = require('path');
+var socketio = require('socket.io');
+var sqlite3 = require('sqlite3').verbose();
+
+//var sass = require('node-sass');
+
+
+var config;
+var DynamicTable = require('./lib/dynamicTable').DynamicTable;
+var loggerLib = new require('./lib/logger');
+var logger = new loggerLib();
+var display_routes = ['cms','collect'];
+var displayApp = express();
+var count = 0;
+var db;
+var displayIO;
+var displaySocket;
+var serversTable;
+var programsTable;
+var tagsTable;
+
+
+
+function createTable(callback) {
+	fs.readFile(path.join(__dirname,'ddl.sql'), function (err, data) {
+		if (err) throw err;
+		var commands = data.toString().split(';');
+		executeCommandList(commands,0,callback)
+	});
+}
+
+function executeCommandList(commands,index,callback){
+	if (index<commands.length){
+		db.run(commands[index],[ ],function(){
+			index++;
+			executeCommandList(commands,index,callback);
+		});
+	}else{
+		callback();
+	}
+}
+
+function getClient(socket) {
+	var endpoint = socket.manager.handshaken[socket.id].address;
+	for(var i in config.clients){
+		if (endpoint.address == config.clients[i].ip){
+			return config.clients[i];
+		}
+	}
+	return null;
+}
+
+function inCommingConnection(socket){
+	var endpoint = socket.manager.handshaken[socket.id].address;
+	//console.log(endpoint.address);
+	//Hier muss noch die IP mit den zu gelassenen verglichen werden!
+	socket.on('put', function (data) {
+		var endpoint = socket.manager.handshaken[socket.id].address;
+		var client = getClient(socket);
+		var values = [
+			serversTable.set(client.name),
+			programsTable.set(data.program),
+			tagsTable.set(data.tag),
+			data.time,
+			data.value
+		];
+		if (typeof displayIO!='undefined'){
+			//displayIO.sockets.emit(values[0]+'/'+values[1]+'/'+values[2],{ time: data.time, value: data.value });
+			displayIO.sockets.emit(values[0]+'/'+values[1],{tag: values[2], time: data.time, value: data.value });
+		}
+		db.run("INSERT INTO data (server_id,program_id,tag_id,time,val)VALUES (?,?,?,?,?)",values,function(){
+			//console.log(client.name+' '+JSON.stringify(values));
+		});
+	});
+}
+
+function initDisplayServer(){
+	// display server
+	displayApp.configure(function(){
+		displayApp.set('port', config.displayPort);
+		displayApp.set('views', path.join(__dirname, 'views'));
+		displayApp.set('view engine', 'jade');
+		displayApp.use(express.json());
+		displayApp.use(express.urlencoded());
+		displayApp.use(express.cookieParser());
+		displayApp.use(express.session({ secret: config.session_secret}));
+		displayApp.use(function (req, res, next) {
+			res.locals.meta = [];
+			res.locals.notice = [];
+			res.locals.remoteip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+			res.locals.breadcrumb = [];
+			res.locals.breadcrumb.push({
+				path: '/',
+				title: 'Startseite'
+			});
+			res.locals.mainnavigation = [];
+			
+			next();
+		});
+		displayApp.use(express.static(path.join(__dirname, 'public')));
+	});
+	displayApp.configure('development', function(){displayApp.use(express.errorHandler());});
+	for(var i in display_routes){
+		var route = require('./routes/'+display_routes[i]);
+		route.initRoute(displayApp,db,serversTable,programsTable,tagsTable);
+	}
+	var displayServer = http.createServer(displayApp);
+	displayServer.listen(displayApp.get('port'), function(){logger.log('info',"display server listening on port " + displayApp.get('port'));});
+	displayIO = require('socket.io').listen(displayServer);
+	displayIO.set('log level', 0);
+	
+	// hier muss noch gerüft werden, ob nur zugelassene clients
+	// diese daten abrufen
+	displayIO.sockets.on('connection', function (socket) {
+		
+	});
+}
+
+
+function initDB(){
+	if (typeof config=='undefined'){
+		logger.log('error','The configuration is invalid.');
+		process.exit();
+	}
+	if (typeof config.db=='undefined'){
+		logger.log('error','No Database type is specified.');
+		process.exit();
+	}
+	if (typeof config.loglevel!=='undefined'){
+		logger.level = config.loglevel;
+	}
+	if (config.db.type!=='sqlite'){
+		logger.log('error','Only SQLite is supported, currently.');
+		process.exit();
+	}else{
+		if (typeof config.db.file=='undefined'){
+			logger.log('error','No Database file is specified.');
+			process.exit();
+		}
+		config.db.file = config.db.file.replace(/^\.\//,__dirname+'/');
+		logger.log('debug',config.db.file);
+		db = new sqlite3.Database(config.db.file, function(){
+			createTable(function(){
+				
+				serversTable = new DynamicTable(db,'servers',logger);
+				programsTable = new DynamicTable(db,'programs',logger);
+				tagsTable = new DynamicTable(db,'tags',logger);
+				if (typeof config.collectPort){
+					
+					
+					
+					logger.log('info','collector listening on port: '+config.collectPort);
+					var io = socketio.listen(config.collectPort);
+					io.set('log level', 0);
+					io.sockets.on('connection', inCommingConnection);
+					
+				}
+				
+				if (typeof config.displayPort){
+					initDisplayServer();
+				} // if (typeof config.displayPort)
+			});
+	}) // sqlite Database
+	}
+}
+
+function findConfiguration(){
+	fs.exists(path.join('etc','crossmon','config.json'),function(exists){
+		if (exists){
+			try{
+				config = require(path.join('etc','crossmon','config.json'));
+				initDB();
+			}catch(e){
+				logger.log('error','The configuration is invalid.');
+			}
+		}else{
+			fs.exists(path.join(__dirname,'config.json'),function(exists){
+				if (exists){
+					try{
+						config = require(path.join(__dirname,'config.json'));
+						initDB();
+					}catch(e){
+						logger.log('error','The configuration is invalid.');
+					}
+				}else{
+					fs.exists(path.join(__dirname,'config.sample.json'),function(exists){
+						if (exists){
+							try{
+								config = require(path.join(__dirname,'config.sample.json'));
+								logger.log('info','The sample configuration file will be loaded.');
+								initDB();
+							}catch(e){
+								logger.log('error','The configuration is invalid.');
+							}
+						}else{
+							logger.log('error','There is no configuration file.');
+							process.exit();
+						}
+					});
+				}
+			});
+		}
+	});
+}
+
+findConfiguration();

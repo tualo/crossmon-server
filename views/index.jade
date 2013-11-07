@@ -1,0 +1,74 @@
+html
+	head
+		meta(charset="utf-8")
+		meta(name="viewport",content="width=device-width, initial-scale=1.0")
+		meta(description="")
+		meta(author="")
+		link(rel="shortcut icon",href="/favicon.png")
+		title crossmon
+
+		link(rel="stylesheet",href="/bootstrap/css/bootstrap.css")
+		link(rel="stylesheet",href="/jumbotron.css")
+		link(rel="stylesheet",href="/d3-chart/nv.d3.css")
+	body
+		div.navbar-wrapper.well
+			div.container
+				div.navbar-header
+					button.navbar-toggle(data-toggle="collapse",data-target=".navbar-collapse")
+						span.icon-bar
+						span.icon-bar
+						span.icon-bar
+					div.navbar-brand 
+						img(src="/favicon.large.png",width="25")
+						
+				div.navbar-collapse.collapse
+					ul.nav.navbar-nav
+						- for (var serverIndex=0; serverIndex<servers.length; serverIndex++)
+							- var item = servers[serverIndex];
+							- var href ='/'+item.id;
+							- var cls = (item.id==server)?'active':'';
+							li(class=cls) 
+								a(href= href) !{item.name}
+
+		div.container-fluid
+			div.row-fluid
+				div.span3
+					div.well.sidebar-nav
+						ul.nav.nav-list
+							li.nav-header Module
+							- for (var index=0; index<programs.length; index++)
+								- var item = programs[index];
+								- var href ='/'+server+'/'+item.id;
+								- var cls = (item.id==program)?'active':'';
+								li(class=cls) 
+									a(href= href) !{item.name}
+							li.nav-header Tags
+							- for (var index=0; index<tags.length; index++)
+								- var item = tags[index];
+								- var href ='/'+server+'/'+program+'/'+item.id;
+								- var cls = (item.id==tag)?'active':'';
+								li(class=cls)
+									a(href= href) !{item.name}
+				div.span9
+					h2 Chart
+						p 
+							svg#chart(style="height:340px")
+
+			hr
+		footer.well
+			p &copy; tualo solutions GmbH 2013 (!{server} | !{program} | !{tag})
+
+		script.
+			var server = !{server};
+			var program = !{program};
+			var tag = !{tag};
+			var servers = !{JSON.stringify(servers)};
+			var programs = !{JSON.stringify(programs)};
+			var tags = !{JSON.stringify(tags)};
+			
+		script(src="/jquery/jquery-2.0.3.min.js")
+		script(src="/bootstrap/js/bootstrap.min.js")
+		script(src="/d3-chart/lib/d3.v3.js")
+		script(src="/d3-chart/nv.d3.js")
+		script(src="/socket.io/socket.io.js")
+		script(src="/app/index.js")
