@@ -187,7 +187,7 @@ function initDB(){
 				process.exit();
 			}
 			db = new mysql();
-			db.connect(config.options);
+			db.connect(config.db.options);
 			createTable(initAfterTableCreation);
 			break;
 		case 'sqlite':
