@@ -15,6 +15,19 @@ Installation
 
     npm install crossmon-server
 
+A sample configuration file can be found in the module directory. 
+At the startup crossmon-server searches for a configuration file. This is the search order:
+
+* /etc/crossmon/config.json
+* [module-home-directory]/config.json
+* [module-home-directory]/config.sample.json
+
+Depending on your configuration you need to install a database module:
+
+* npm install sqlite3 for storing the data in a sqlite-database
+* npm install mysql for storing the data in a mysql-database
+* other databases comming soon ...
+
 Running
 =======
 
@@ -22,3 +35,4 @@ Running
 or
 
     foerver start server.js
+

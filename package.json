@@ -3,6 +3,9 @@
 	"description": "Server-Monitoring-App written in JavaScript ",
 	"homepage": "http://tualo.de",
 	"main": "server.js",
+	"bin": {
+		"crossmon-server": "./bin/crossmon-server.js"
+	}
 	"version": "0.0.5",
 	"engines": {
 		"node": ">=0.8.0"
@@ -20,5 +23,9 @@
 		"express": ">=3.1.1",
 		"jade": ">=0.28.2",
 		"socket.io": "*"
+	},
+	"repository" : {
+		"type" : "git",
+		"url" : "https://github.com/tualo/crossmon-server.git"
 	}
 }
