@@ -17,7 +17,7 @@ create table if not exists data (
 	server_id integer not null,
 	program_id integer not null, 
 	tag_id integer not null, 
-	time integer not null, 
+	time bigint not null, 
 	val fixed(16,5), 
 	foreign key(server_id) references servers(id) on delete cascade,
 	foreign key(program_id) references programs(id) on delete cascade,
