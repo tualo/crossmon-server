@@ -2,6 +2,8 @@
 	"displayPort": 8070,
 	"collectPort": 7654,
 	"loglevel": 2,
+	"public": "./public",
+	"views": "./views",
 	"db":{
 		"#type": "sqlite",
 		"#file": "./data.sqlite",

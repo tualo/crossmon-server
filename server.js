@@ -77,7 +77,10 @@ function getClient(socket) {
 function inCommingConnection(socket){
 	var endpoint = socket.manager.handshaken[socket.id].address;
 	//console.log(endpoint.address);
-	//Hier muss noch die IP mit den zu gelassenen verglichen werden!
+	var testClient = getClient(socket);
+	if (typeof testClient=='undefined'){
+		socket.disconnect();
+	}
 	socket.on('put', function (data) {
 		var endpoint = socket.manager.handshaken[socket.id].address;
 		var client = getClient(socket);
@@ -103,8 +106,17 @@ function inCommingConnection(socket){
 function initDisplayServer(){
 	// display server
 	displayApp.configure(function(){
+		var publicDir = './public';
+		if (typeof config.public!='undefined'){
+			publicDir = config.public.replace(/^\.\//,__dirname+'/');
+		}
+		var viewsDir = './views';
+		if (typeof config.views!='undefined'){
+			viewsDir = config.views.replace(/^\.\//,__dirname+'/');
+		}
+		
 		displayApp.set('port', config.displayPort);
-		displayApp.set('views', path.join(__dirname, 'views'));
+		displayApp.set('views', viewsDir);
 		displayApp.set('view engine', 'jade');
 		displayApp.use(express.json());
 		displayApp.use(express.urlencoded());
@@ -123,7 +135,7 @@ function initDisplayServer(){
 			
 			next();
 		});
-		displayApp.use(express.static(path.join(__dirname, 'public')));
+		displayApp.use(express.static(publicDir));
 	});
 	displayApp.configure('development', function(){displayApp.use(express.errorHandler());});
 	for(var i in display_routes){
