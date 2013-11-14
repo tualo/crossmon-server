@@ -33,12 +33,12 @@ var singleitem = function (req, res, next) {
 			return res.json({err: err});
 		}
 		//select id,name from programs join data on programs.id=data.program_id where server_id=1  group by id,name
-		db.all("select id,name from programs join data on programs.id=data.program_id where server_id="+server+"  group by id,name", function(err, programs) {
+		db.all("select id,name from programs join server_programs on programs.id=server_programs.program_id where server_id="+server+"  group by id,name", function(err, programs) {
 			logger.log('debug','ID '+timestamp+' programs: '+(Math.round(new Date().getTime())-timestamp ) );
 			if (err){
 				return res.json({err: err});
 			}
-			db.all("select id,name from tags join data on tags.id=data.tag_id where server_id="+server+" and program_id="+program+"  group by id,name", function(err, tags) {
+			db.all("select id,name from tags join server_programs_tags on tags.id=server_programs_tags.tag_id where server_id="+server+" and program_id="+program+"  group by id,name", function(err, tags) {
 				logger.log('debug','ID '+timestamp+' tags: '+(Math.round(new Date().getTime())-timestamp ) );
 			
 				if (err){

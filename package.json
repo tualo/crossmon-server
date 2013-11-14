@@ -6,17 +6,20 @@
 	"bin": {
 		"crossmon-server": "./bin/crossmon-server.js"
 	},
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"engines": {
 		"node": ">=0.8.0"
 	},
 	"maintainers": [
-	{
-		"name": "Thomas Hoffmann",
-		"email": "thomas.hoffmann@tualo.de",
-		"url": "http://tualo.de/"
-	}
+		{
+			"name": "Thomas Hoffmann",
+			"email": "thomas.hoffmann@tualo.de",
+			"url": "http://tualo.de/"
+		}
 	],
+	"bin": {
+		"crossmon-server": "./bin/crossmon-server"
+	},
 	"readmeFilename": "README.md",
 	"license": "GPL/V3",
 	"dependencies": {

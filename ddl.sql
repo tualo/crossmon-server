@@ -25,3 +25,22 @@ create table if not exists data (
 	
 	primary key (server_id,program_id,tag_id,time) 
 );
+
+create index idx_data_program_id on data(program_id);
+create index idx_data_server_id on data(server_id);
+create index idx_data_tag_id on data(tag_id);
+
+create table if not exists server_programs (
+	server_id integer not null,
+	program_id integer not null,
+	primary key (server_id,program_id) 
+);
+
+create table if not exists server_programs_tags (
+	server_id integer not null,
+	program_id integer not null,
+	tag_id integer not null,
+	primary key (server_id,program_id,tag_id) 
+);
+
+

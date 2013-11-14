@@ -30,6 +30,15 @@ var insertStack = [];
 var stackTimer;
 var insertStack_locked=false;
 
+
+function refreshIndexTables(){
+	db.run('insert into server_programs (server_id,program_id) select server_id,program_id from data group by server_id,program_id on duplicate key update program_id=values(program_id)',[ ],function(){
+		db.run('insert into server_programs_tags (server_id,program_id,tag_id) select server_id,program_id,tag_id from data group by server_id,program_id on duplicate key update program_id=values(program_id)',[ ],function(){
+			setTimeout(refreshIndexTables,60000);
+		});
+	});
+}
+
 function writeStack(){
 	if (insertStack.length>0){
 		insertStack_locked=true;
@@ -165,6 +174,7 @@ var initAfterTableCreation = function(){
 		
 		
 		setInterval(writeStack,10000);
+		setTimeout(refreshIndexTables,60000);
 		logger.log('info','collector listening on port: '+config.collectPort);
 		var io = socketio.listen(config.collectPort);
 		io.set('log level', 0);
