@@ -1,3 +1,92 @@
 #!/usr/bin/env node
 
-require('../server.js')
+
+var program = require('commander');
+var pjson = require('../package.json');
+var findconfig = require('../lib/findconfig.js');
+
+program
+	.version(pjson.version)
+	.description('Crossmon server, monitoring stats of the server')
+	.option('start', 'Start the deamon')
+	.option('stop', 'Stop the deamon')
+	.option('info', 'show the service configuration')
+	.option('simplesetup', 'setting up the service, with cpu-usage monitoring')
+	.parse(process.argv);
+
+
+var forever = require('forever');
+var path = require('path');
+if (program.start){
+	
+	forever.startDaemon(path.join(__dirname,'..','server.js'),{
+		uid: 'crossmon-server'
+	});
+	console.log(pjson.name+' started');
+}
+
+if (program.stop){
+	forever.stop('crossmon-server');
+	console.log(pjson.name+' stoped');
+}
+
+if(program.info){
+	findconfig.findConfiguration(function(_cnf,file){
+		console.log("\n\nFollowing file will be used: "+file);
+		console.log("\nThe monitor display server");
+		console.log("==========================");
+		console.log("\tdisplay-server port: "+ ((_cnf.displayPort)?_cnf.displayPort:'not set') );
+		console.log("\tweb directory (public files): "+ ((_cnf.public)?_cnf.public:'[module home]/public') );
+		console.log("\tview directory: "+ ((_cnf.views)?_cnf.views:'[module home]/views') );
+		console.log("\tsession secret: "+ ((_cnf.session_secret)?_cnf.session_secret:'not set') );
+		
+		console.log("\n\nThe collecting server");
+		console.log("=====================");
+		console.log("\tcollecting-service port: "+ ((_cnf.collectPort)?_cnf.collectPort:'not set') );
+		console.log("\n\tDatabase:" );
+		if (_cnf.db){
+			console.log("\t\ttype: " + ( (_cnf.db.type)?(_cnf.db.type):'not set' ));
+			switch(_cnf.db.type){
+				case 'mysql':
+					try{
+						var m = require('mysqlx');
+						console.log("\t\tmodule: ok");
+					}catch(e){
+						console.log("\t\tmodule: can't find/ load the module, may be you must install it (npm install mysql [-g])");
+					}
+					if(_cnf.db.options){
+						console.log("\t\thost: " +( (_cnf.db.options.host)?(_cnf.db.options.host):'not set' ) );
+						console.log("\t\tdatabase: " +( (_cnf.db.options.database)?(_cnf.db.options.database):'not set' ) );
+						console.log("\t\tusername: " +( (_cnf.db.options.username)?(_cnf.db.options.username):'not set' ) );
+						console.log("\t\tpassword: " +( (_cnf.db.options.password)?(_cnf.db.options.password):'not set' ) );
+					}else{
+						console.log("\t\tThere is no database options entry." );
+					}
+					break;
+				case 'sqlite':
+					try{
+						var m = require('sqlite3');
+						console.log("\t\tmodule: ok");
+					}catch(e){
+						console.log("\t\tmodule: can't find/ load the module, may be you must install it (npm install sqlite3 [-g])");
+					}
+					console.log("\t\tfile: " +( (_cnf.db.file)?(_cnf.db.file):'not set' ) );
+					break;
+			}
+			
+		}else{
+			console.log("\t\tThere is no database setup." );
+		}
+		
+		console.log("\n\tAllowed clients for collecting service:" );
+		if (_cnf.clients){
+			for(var i in _cnf.clients){
+				console.log("\t\tClient No. "+i+": ");
+				console.log("\t\t\tIP: "+_cnf.clients[i].ip);
+				console.log("\t\t\tName: "+_cnf.clients[i].name);
+			}
+		}else{
+			console.log("\tThere are no clients allowed." );
+		}
+	})
+}
