@@ -13,7 +13,7 @@ Requirements
 Installation
 ============
 
-    npm install crossmon-server
+    npm install crossmon-server -g
 
 A sample configuration file can be found in the module directory. 
 At the startup crossmon-server searches for a configuration file. This is the search order:
@@ -31,8 +31,15 @@ Depending on your configuration you need to install a database module:
 Running
 =======
 
-    node server.js
-or
+You can start the service with
 
-    foerver start server.js
+    crossmon-server start
+
+Stop the service with
+
+    crossmon-server stop
+
+Getting information of the current configuration
+
+    crossmon-server info
 
