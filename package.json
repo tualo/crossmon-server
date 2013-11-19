@@ -6,10 +6,14 @@
 	"bin": {
 		"crossmon-server": "./bin/crossmon-server.js"
 	},
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"engines": {
 		"node": ">=0.8.0"
 	},
+	"keywords":[
+		"monitoring",
+		"chart"
+	],
 	"maintainers": [
 		{
 			"name": "Thomas Hoffmann",
@@ -25,7 +29,9 @@
 	"dependencies": {
 		"express": ">=3.1.1",
 		"jade": ">=0.28.2",
-		"socket.io": "*"
+		"socket.io": "*",
+		"forever": ">=0.10.9",
+		"commander": ">=2.0.0"
 	},
 	"repository" : {
 		"type" : "git",

@@ -55,8 +55,16 @@ html
 			div.row
 				div.col-md-12
 					h2 Chart
-						p 
-							svg#chart(style="height:340px")
+					p 
+						svg#chart(style="height:340px")
+			div.row
+				div.col-md1-2
+					button#reload.btn.btn-primary.btn-lg.pull-right(type="button") 
+						span.glyphicon.glyphicon-refresh &nbsp;
+						span.txt Reload
+					button#startstop.btn.btn-success.btn-lg.pull-right(type="button")
+						span.glyphicon.glyphicon-play &nbsp;
+						span.txt Start
 		footer.navbar-fixed-bottom
 			div.container
 				p &copy; tualo solutions GmbH 2013

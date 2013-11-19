@@ -4,9 +4,9 @@ body{
 }
 }
 @media (max-width: 767px) {
-body{
-	padding-top: 150px;
-}
+	body{
+		padding-top: 150px;
+	}
 }
 .navbutton{
 	color: #ffffff;
@@ -15,4 +15,7 @@ body{
 }
 .navbutton span{
 	padding-left: 1px;
+}
+#reload{
+	margin-left: 5px;
 }
