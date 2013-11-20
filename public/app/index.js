@@ -8,17 +8,36 @@ function formatDateTime(d){
 	if (s.length==1){s='0'+s ;}
 	return h+':'+m+':'+s;
 }
+function reloadChart(){} // emtpy, for later use
+
+var liveData = false;
+
 $( document ).ready(function() {
 	
-	/*
-	window.setTimeout(function(){
-		window.location.reload();
-	},90000);
-	*/
 	
 	var socket = io.connect(window.location.origin);
-	 
-		
+	
+	
+	$('#reload').click(function(){
+		reloadChart();
+	});
+	
+	$('#startstop').click(function(){
+		if(liveData){
+			$('#startstop .txt').html('Start');
+			$('#startstop').removeClass('active');
+			$('#startstop .glyphicon').removeClass('glyphicon-stop');
+			$('#startstop .glyphicon').addClass('glyphicon-play');
+			liveData=false;
+		}else{
+			$('#startstop .txt').html('Stop');
+			$('#startstop').addClass('active');
+			$('#startstop .glyphicon').removeClass('glyphicon-play');
+			$('#startstop .glyphicon').addClass('glyphicon-stop');
+			liveData=true;
+		}
+	});
+	
 	$.ajax({
 		url: "/chartData/"+server+"/"+program+"/"+tag+"",
 		
@@ -26,11 +45,11 @@ $( document ).ready(function() {
 		var vdata = data;
 		nv.addGraph(function() {
 
-			var chart = nv.models.stackedAreaChart();
+			var chart = nv.models.lineChart();
 			chart.xAxis.axisLabel('Time').tickFormat(formatDateTime);
 			chart.yAxis.axisLabel('Percent').tickFormat(d3.format('.02f'));
 			 
-			//d3.select('#chart').datum(vdata).transition().duration(500).call(chart);
+			d3.select('#chart').datum(vdata).transition().duration(500).call(chart);
 			nv.utils.windowResize(chart.update);
 			
 			
@@ -51,8 +70,7 @@ $( document ).ready(function() {
 			});
 				
 				
-			 
-			window.setInterval(function(){
+			reloadChart = function(){
 				var m = vdata[0].values.length;
 				for(var i in vdata){
 					m = Math.min(m,vdata[i].values.length);
@@ -68,61 +86,17 @@ $( document ).ready(function() {
 				.datum(vdata)
 				.transition().duration(50)
 				.call(chart);
-			},1000)
+			}
+			window.setInterval(function(){
+				console.log('tick')
+				if (liveData){
+					reloadChart();
+				}
+			},3000)
 			 
 			return chart;
 		});
 	});
 	
-	/*
-	$.ajax({
-		url: "/chartData/1/1/2",
-		
-	}).done(function( data ) {
-		var vdata = [
-			{
-				values: data,
-				key: 'Memory',
-				color: '#7fff0e'
-			}
-		];
-		nv.addGraph(function() {
-			var chart = nv.models.stackedAreaChart();
-			
-			chart.xAxis
-			.axisLabel('Time')
-			.tickFormat(formatDateTime);
-				//d3.format(',r'));
-			
-			chart.yAxis
-			.axisLabel('MB')
-			.tickFormat(function(d) { 
-				return d3.format('.02f')(d/1024/1024) 
-			});
-			
-			d3.select('#memory')
-			.datum(vdata)
-			.transition().duration(500)
-			.call(chart);
-			 
-			socket.on('1/1/2', function (data) {
-				 
-				vdata[0].values.shift();
-				vdata[0].values.push({
-					x: data.time,
-					y: data.value
-				});
-				d3.select('#memory')
-				.datum(vdata)
-				.transition().duration(5)
-				.call(chart);
-				 
-			});
-			 
-			nv.utils.windowResize(chart.update);
-			
-			return chart;
-		});
-	});
-	*/
+	
 });

@@ -15,6 +15,8 @@ var socketio = require('socket.io');
 var config;
 var DynamicTable = require('./lib/dynamicTable').DynamicTable;
 var loggerLib = new require('./lib/logger');
+var find_config = require('./lib/findconfig');
+
 var logger = new loggerLib();
 var display_routes = ['cms','collect'];
 var displayApp = express();
@@ -33,7 +35,7 @@ var insertStack_locked=false;
 
 function refreshIndexTables(){
 	db.run('insert into server_programs (server_id,program_id) select server_id,program_id from data group by server_id,program_id on duplicate key update program_id=values(program_id)',[ ],function(){
-		db.run('insert into server_programs_tags (server_id,program_id,tag_id) select server_id,program_id,tag_id from data group by server_id,program_id on duplicate key update program_id=values(program_id)',[ ],function(){
+		db.run('insert into server_programs_tags (server_id,program_id,tag_id) select server_id,program_id,tag_id from data group by server_id,program_id,tag_id on duplicate key update program_id=values(program_id)',[ ],function(){
 			setTimeout(refreshIndexTables,60000);
 		});
 	});
@@ -187,7 +189,8 @@ var initAfterTableCreation = function(){
 	} // if (typeof config.displayPort)
 }
 
-function initDB(){
+function initDB(_cnf){
+	config = _cnf;
 	if (typeof config=='undefined'){
 		logger.log('error','The configuration is invalid.');
 		process.exit();
@@ -238,43 +241,5 @@ function initDB(){
 	}
 }
 
-function findConfiguration(){
-	fs.exists(path.join('/etc','crossmon','config.json'),function(exists){
-		if (exists){
-			try{
-				config = require(path.join('/etc','crossmon','config.json'));
-				initDB();
-			}catch(e){
-				logger.log('error','The configuration is invalid. '+e.Error);
-			}
-		}else{
-			fs.exists(path.join(__dirname,'config.json'),function(exists){
-				if (exists){
-					try{
-						config = require(path.join(__dirname,'config.json'));
-						initDB();
-					}catch(e){
-						logger.log('error','The configuration is invalid.');
-					}
-				}else{
-					fs.exists(path.join(__dirname,'config.sample.json'),function(exists){
-						if (exists){
-							try{
-								config = require(path.join(__dirname,'config.sample.json'));
-								logger.log('info','The sample configuration file will be loaded.');
-								initDB();
-							}catch(e){
-								logger.log('error','The configuration is invalid.');
-							}
-						}else{
-							logger.log('error','There is no configuration file.');
-							process.exit();
-						}
-					});
-				}
-			});
-		}
-	});
-}
 
-findConfiguration();
+find_config.findConfiguration(initDB);
