@@ -90,3 +90,16 @@ if(program.info){
 		}
 	})
 }
+
+if (program.simplesetup){
+	var readline = require('readline');
+	var rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
+	rl.question("Where should the configuration file placed (type e for /etc/crossmon, m for the modules directory, a for abort)? [e,m,a]", function(answer) {
+		// TODO: Log the answer in a database
+		console.log("Thank you for your valuable feedback:", answer);
+		rl.close();
+	});
+}
