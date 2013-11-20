@@ -15,6 +15,10 @@ Installation
 
     npm install crossmon-server -g
 
+To start with a sample configuration gattering the cpu usage of the current machine you can use the setup script.
+
+    crossmon-server simplesetup
+
 A sample configuration file can be found in the module directory. 
 At the startup crossmon-server searches for a configuration file. This is the search order:
 
