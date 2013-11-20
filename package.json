@@ -31,7 +31,8 @@
 		"jade": ">=0.28.2",
 		"socket.io": "*",
 		"forever": ">=0.10.9",
-		"commander": ">=2.0.0"
+		"commander": ">=2.0.0",
+		"step": ">=0.0.5"
 	},
 	"repository" : {
 		"type" : "git",
