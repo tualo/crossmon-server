@@ -19,7 +19,6 @@ program
 var forever = require('forever');
 var path = require('path');
 if (program.start){
-	
 	forever.startDaemon(path.join(__dirname,'..','server.js'),{
 		uid: 'crossmon-server'
 	});
