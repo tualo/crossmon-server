@@ -8,8 +8,9 @@ var findconfig = require('../lib/findconfig.js');
 program
 	.version(pjson.version)
 	.description('Crossmon server, monitoring stats of the server')
-	.option('start', 'Start the deamon')
-	.option('stop', 'Stop the deamon')
+	.option('start', 'starts the deamon')
+	.option('stop', 'stops the deamon')
+	.option('restart', 'restarts the deamon')
 	.option('info', 'show the service configuration')
 	.option('simplesetup', 'setting up the service, with cpu-usage monitoring')
 	.parse(process.argv);
@@ -28,6 +29,11 @@ if (program.start){
 if (program.stop){
 	forever.stop('crossmon-server');
 	console.log(pjson.name+' stoped');
+}
+
+if (program.restart){
+	forever.restart('crossmon-server');
+	console.log(pjson.name+' restarted');
 }
 
 if(program.info){
