@@ -6,7 +6,7 @@
 	"bin": {
 		"crossmon-server": "./bin/crossmon-server.js"
 	},
-	"version": "0.0.14",
+	"version": "0.0.15",
 	"engines": {
 		"node": ">=0.8.0"
 	},
@@ -32,6 +32,7 @@
 		"jade": ">=0.28.2",
 		"socket.io": "*",
 		"commander": ">=2.0.0",
+		"path-extra": ">=0.1.0",
 		"step": ">=0.0.5"
 	},
 	"repository" : {

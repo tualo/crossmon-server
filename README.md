@@ -2,15 +2,15 @@ Description
 ===========
 
 Crossmon services contains of two services. crossmon-server 
-acts as display server and storage server for the collected 
-datas. That display can be viewed in your browser. The 
+acts as http and storage server for the collected 
+datas. The http server presents all the collected data in graphs trough 
+the website. The 
 second service [crossmon-collect](https://npmjs.org/package/crossmon-collect) 
 run on every machine you want to observe. This service starts 
 periodically the collecting modules and send the collected 
 datas to the crossmon-server.
 
-The display server presents all the collected data in graphs trough 
-the website.
+
 
 A sample configuration file can be found in the module directory. 
 At the startup crossmon-server searches for a configuration file. 

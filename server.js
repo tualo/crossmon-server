@@ -6,8 +6,8 @@ var express = require('express');
 var fs = require('fs');
 var http = require('http');
 var path = require('path');
+var pathExtra = require('path-extra');
 var socketio = require('socket.io');
-
 
 //var sass = require('node-sass');
 
@@ -240,6 +240,8 @@ function initDB(_cnf){
 				process.exit();
 			}
 			config.db.file = config.db.file.replace(/^\.\//,__dirname+'/');
+			config.db.file = config.db.file.replace('~',pathExtra.homedir());
+			
 			logger.log('debug',config.db.file);
 			db = new sqlite3.Database(config.db.file, function(){
 				createTable(initAfterTableCreation);
