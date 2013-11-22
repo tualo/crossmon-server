@@ -8,18 +8,16 @@
 		"#type": "sqlite",
 		"#file": "./data.sqlite",
 		"type": "mysql",
-		"options": {
-			"host": "localhost",
-			"database": "crossmon",
-			"username": "root",
-			"password": ""
-		}
+		"host": "localhost",
+		"database": "crossmon",
+		"username": "root",
+		"password": ""
 	},
 	"session_secret": "bshdguzetVDhgf",
 	"clients": [
 		{
 			"name": "Server 1",
-			"ip": "127.0.0.1"
+			"host": "127.0.0.1"
 		}
 	]
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 
+var fs = require('fs');
 var program = require('commander');
 var pjson = require('../package.json');
 var findconfig = require('../lib/findconfig.js');
@@ -12,7 +13,8 @@ program
 	.option('stop', 'stops the deamon')
 	.option('restart', 'restarts the deamon')
 	.option('info', 'show the service configuration')
-	.option('simplesetup', 'setting up the service, with cpu-usage monitoring')
+	.option('setup', 'setting up the service')
+	.option('simplesetup', 'setting up the sample service, with cpu-usage monitoring')
 	.parse(process.argv);
 
 
@@ -35,9 +37,42 @@ if (program.restart){
 	console.log(pjson.name+' restarted');
 }
 
+
+if (program.setup){
+	findconfig.findConfiguration(function(_cnf,file){
+		console.log("\n\n"+file+" will be used.");
+		var setup = require('../lib/setup.js');
+		setup.setup(_cnf,function(err,config){
+			if (err){
+				if(err.code===0){
+					console.log('exit by user');
+				}else{
+					console.log(err);
+				}
+			}else{
+				fs.writeFile(file, JSON.stringify(config,null,4), function (err) {
+					if (err){
+				if (err.code==='EACCES'){
+					console.log('you cannot write to '+file);
+				}else{
+					console.log(err);
+				}
+				return;
+			}
+			console.log('the config is written');
+			console.log('now you must restart the gattering service: crossmon-server restart');
+					
+				});
+			}
+		});
+	});
+}
+
+
 if(program.info){
 	findconfig.findConfiguration(function(_cnf,file){
 		console.log("\n\nFollowing file will be used: "+file);
+		
 		console.log("\nThe monitor display server");
 		console.log("==========================");
 		console.log("\tdisplay-server port: "+ ((_cnf.displayPort)?_cnf.displayPort:'not set') );
@@ -69,12 +104,14 @@ if(program.info){
 					}
 					break;
 				case 'sqlite':
+					
 					try{
 						var m = require('sqlite3');
 						console.log("\t\tmodule: ok");
 					}catch(e){
 						console.log("\t\tmodule: can't find/ load the module, may be you must install it (npm install sqlite3 [-g])");
 					}
+					
 					console.log("\t\tfile: " +( (_cnf.db.file)?(_cnf.db.file):'not set' ) );
 					break;
 			}

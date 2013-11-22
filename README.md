@@ -1,12 +1,21 @@
 Description
 ===========
 
-Crossmon-server is a monitoring server for linux and osx. 
-Crossmon-server can handle multiple servers in a network. 
-Results can be displayed in a browser.
+Crossmon services contains of two services. crossmon-server 
+acts as display server and storage server for the collected 
+datas. That display can be viewed in your browser. The 
+second service [crossmon-collect](https://npmjs.org/package/crossmon-collect) 
+run on every machine you want to observe. This service starts 
+periodically the collecting modules and send the collected 
+datas to the crossmon-server.
+
+The display server presents all the collected data in graphs trough 
+the website.
 
 A sample configuration file can be found in the module directory. 
-At the startup crossmon-server searches for a configuration file. This is the search order:
+At the startup crossmon-server searches for a configuration file. 
+
+This is the search order:
 
 * /etc/crossmon/config.json
 * [module-home-directory]/config.json
@@ -28,10 +37,13 @@ Installation
 
     npm install crossmon-server -g
 
-To start with a sample configuration gattering the cpu usage of the current machine you can use the setup script.
+To start with a sample configuration gattering the cpu usage of the current machine you can use the simple setup script:
 
     crossmon-server simplesetup
 
+To configure the hole service including the allowed collecting machines (clients), you can run:
+
+    crossmon-server setup
 
 Running
 =======
@@ -43,6 +55,10 @@ You can start the service with
 Stop the service with
 
     crossmon-server stop
+
+Restarting the service with
+
+    crossmon-server restart
 
 Getting information of the current configuration
 

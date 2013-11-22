@@ -6,7 +6,7 @@ function formatDateTime(d){
 	if (h.length==1){h='0'+h;}
 	if (m.length==1){m='0'+m;}
 	if (s.length==1){s='0'+s ;}
-	return h+':'+m+':'+s;
+	return h+':'+m+':'+s+"\n"+(dt.getMonth()+1)+"/"+dt.getDate()+"/"+dt.getFullYear();
 }
 function reloadChart(){} // emtpy, for later use
 

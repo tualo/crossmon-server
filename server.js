@@ -45,7 +45,7 @@ function writeStack(){
 	if (insertStack.length>0){
 		insertStack_locked=true;
 		logger.log('debug',"write to db "+insertStack.length+" entries");
-		var stmt = db.prepare("INSERT INTO data (server_id,program_id,tag_id,time,val)VALUES (?,?,?,?,?)");
+		var stmt = db.prepare("INSERT INTO data (server_id,program_id,tag_id,time,val)VALUES (?,?,?,?,?) on duplicate key update val=values(val) ");
 		for (var i = 0; i < insertStack.length; i++) {
 			stmt.run(insertStack[i]);
 		}
@@ -212,7 +212,17 @@ function initDB(_cnf){
 				process.exit();
 			}
 			db = new mysql();
-			db.connect(config.db.options);
+			
+			// only for older configs 
+			if (typeof config.db.options!='undefined'){
+				for(var i in config.db.options){
+					config.db[i] = config.db.options[i];
+				}
+			}
+			
+			var opt = config.db;
+			delete opt.type;
+			db.connect(opt);
 			createTable(initAfterTableCreation);
 			break;
 		case 'sqlite':

@@ -1,16 +1,17 @@
 {
 	"name": "crossmon-server",
-	"description": "Live server monitoring service",
+	"description": "Graphical monitoring service",
 	"homepage": "http://tualo.de",
 	"main": "server.js",
 	"bin": {
 		"crossmon-server": "./bin/crossmon-server.js"
 	},
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"engines": {
 		"node": ">=0.8.0"
 	},
 	"keywords":[
+		"crossmon",
 		"monitoring",
 		"chart"
 	],
