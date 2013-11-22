@@ -11,7 +11,7 @@ html
 		link(rel="stylesheet",href="/bootstrap/css/bootstrap.css")
 		link(rel="stylesheet",href="/app/style.css")
 	body
-		header.navbar.navbar-inverse.navbar-fixed-top(role="banner")
+		header.navbar.navbar-inset.navbar-top(role="banner")
 			div.container
 				div.navbar-header
 						button.navbar-toggle(data-toggle="collapse",data-target=".main-navbar-collapse")
@@ -32,18 +32,24 @@ html
 				div.navbar-header
 					button.navbar-toggle(data-toggle="collapse",data-target=".sub-navbar-collapse")
 							span.glyphicon.glyphicon-list.navbutton 
-								span Module
+								span Modules
 				nav.navbar-header(role="navigation")
 					div.collapse.navbar-collapse.sub-navbar-collapse
 						ul.nav.navbar-nav
-							li.nav-header Modul
-								- for (var index=0; index<programs.length; index++)
-									- var item = programs[index];
-									- var href ='/'+server+'/'+item.id;
-									- var cls = (item.id==program)?'active':'';
-									li(class=cls) 
-										a(href= href) !{item.name}
-							li.nav-header Tags
+							- for (var index=0; index<programs.length; index++)
+								- var item = programs[index];
+								- var href ='/'+server+'/'+item.id;
+								- var cls = (item.id==program)?'active':'';
+								li(class=cls) 
+									a(href= href) !{item.name}
+			div.container
+				div.navbar-header
+					button.navbar-toggle(data-toggle="collapse",data-target=".tags-navbar-collapse")
+							span.glyphicon.glyphicon-list.navbutton 
+								span Tags
+				nav.navbar-header(role="navigation")
+					div.collapse.navbar-collapse.tags-navbar-collapse
+						ul.nav.navbar-nav
 							- for (var index=0; index<tags.length; index++)
 								- var item = tags[index];
 								- var href ='/'+server+'/'+program+'/'+item.id;

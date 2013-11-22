@@ -61,7 +61,10 @@ var singleitem = function (req, res, next) {
 			}
 			output.push(item);
 		}
-		res.json(output);
+		res.json({
+			list:output,
+			preveredChart: 'lineChart'
+		});
 		logger.log('debug','ID collect '+timestamp+' done');
 	});
 }
