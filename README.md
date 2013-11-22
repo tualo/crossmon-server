@@ -3,7 +3,20 @@ Description
 
 Crossmon-server is a monitoring server for linux and osx. 
 Crossmon-server can handle multiple servers in a network. 
-Results can be displayed in a html5 compatible browser.
+Results can be displayed in a browser.
+
+A sample configuration file can be found in the module directory. 
+At the startup crossmon-server searches for a configuration file. This is the search order:
+
+* /etc/crossmon/config.json
+* [module-home-directory]/config.json
+* [module-home-directory]/config.sample.json
+
+Depending on your configuration you need to install a database module:
+
+* npm install sqlite3 for storing the data in a sqlite-database
+* npm install mysql for storing the data in a mysql-database
+* other databases comming soon ...
 
 Requirements
 ============
@@ -19,18 +32,6 @@ To start with a sample configuration gattering the cpu usage of the current mach
 
     crossmon-server simplesetup
 
-A sample configuration file can be found in the module directory. 
-At the startup crossmon-server searches for a configuration file. This is the search order:
-
-* /etc/crossmon/config.json
-* [module-home-directory]/config.json
-* [module-home-directory]/config.sample.json
-
-Depending on your configuration you need to install a database module:
-
-* npm install sqlite3 for storing the data in a sqlite-database
-* npm install mysql for storing the data in a mysql-database
-* other databases comming soon ...
 
 Running
 =======
