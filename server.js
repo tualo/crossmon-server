@@ -226,6 +226,7 @@ function initDB(_cnf){
 			createTable(initAfterTableCreation);
 			break;
 		case 'sqlite':
+		case 'sqlite3':
 			
 			if (typeof config.db.file=='undefined'){
 				logger.log('error','No Database file is specified.');
@@ -245,7 +246,7 @@ function initDB(_cnf){
 			}) // sqlite Database
 			break;
 		default:
-			logger.log('error','Only SQLite is supported, currently.');
+			logger.log('error','your selected database is not supported.');
 			process.exit();
 			break;
 	}
