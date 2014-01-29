@@ -43,4 +43,4 @@ create table if not exists server_programs_tags (
 	primary key (server_id,program_id,tag_id) 
 );
 
-
+create index idx_data_time on data(time);
